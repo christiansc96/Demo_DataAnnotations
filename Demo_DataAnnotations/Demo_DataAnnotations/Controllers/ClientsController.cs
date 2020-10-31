@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Demo_DataAnnotations.Context;
 using Demo_DataAnnotations.Models.DBModels;
 using System.Linq;
+using Demo_DataAnnotations.DTOs;
 
 namespace Demo_DataAnnotations.Controllers
 {
@@ -65,7 +66,7 @@ namespace Demo_DataAnnotations.Controllers
 
         // PUT: api/Clients/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutClientes(int id, Clientes model)
+        public async Task<IActionResult> PutClientes(int id, ClientDTO model)
         {
             bool compareId = id != model.CodCliente;
             if (compareId)
@@ -80,7 +81,17 @@ namespace Demo_DataAnnotations.Controllers
                 return NotFound();
             }
 
-            _context.Entry(model).State = EntityState.Modified;
+            clientFromDatabase.NombreCliente = model.NombreCliente;
+            clientFromDatabase.NombreNegocio = model.NombreNegocio;
+            clientFromDatabase.Rtn = model.RTN;
+            clientFromDatabase.DireccionNegocio = model.DireccionNegocio;
+            clientFromDatabase.CorreoElectronico = model.CorreoElectronico;
+            clientFromDatabase.NumeroTelefono = model.NumeroTelefono;
+            clientFromDatabase.ContactoPrincipal = model.ContactoPrincipal;
+            clientFromDatabase.Activo = model.Activo;
+            clientFromDatabase.CodCategoriaCliente = model.CodCategoriaCliente;
+
+            _context.Clientes.Update(clientFromDatabase);
 
             try
             {
@@ -95,9 +106,22 @@ namespace Demo_DataAnnotations.Controllers
 
         // POST: api/Clients
         [HttpPost]
-        public async Task<IActionResult> PostClientes(Clientes clientes)
+        public async Task<IActionResult> PostClientes(ClientDTO model)
         {
-            _context.Clientes.Add(clientes);
+            Clientes newClient = new Clientes()
+            {
+                NombreCliente = model.NombreCliente,
+                NombreNegocio = model.NombreNegocio,
+                Rtn = model.RTN,
+                DireccionNegocio = model.DireccionNegocio,
+                CorreoElectronico = model.CorreoElectronico,
+                NumeroTelefono = model.NumeroTelefono,
+                ContactoPrincipal = model.ContactoPrincipal,
+                Activo = model.Activo,
+                CodCategoriaCliente = model.CodCategoriaCliente,
+            };
+            _context.Clientes.Add(newClient);
+
             try
             {
                 await _context.SaveChangesAsync();

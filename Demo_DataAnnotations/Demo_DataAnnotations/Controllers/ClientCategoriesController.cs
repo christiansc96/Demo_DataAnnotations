@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Demo_DataAnnotations.Context;
 using Demo_DataAnnotations.Models.DBModels;
+using Demo_DataAnnotations.DTOs;
 
 namespace Demo_DataAnnotations.Controllers
 {
@@ -54,7 +55,7 @@ namespace Demo_DataAnnotations.Controllers
 
         // PUT: api/ClientCategories/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, CategoriaCliente model)
+        public async Task<IActionResult> PutCategory(int id, CategoryDTO model)
         {
             bool compareId = id != model.CodCategoriaCliente;
             if (compareId)
@@ -69,8 +70,11 @@ namespace Demo_DataAnnotations.Controllers
                 return NotFound();
             }
 
-            _context.Entry(model).State = EntityState.Modified;
-
+            categoryFromDatabase.NombreCategoriaCliente = model.NombreCategoriaCliente;
+            categoryFromDatabase.DescripcionCategoriaCliente = model.DescripcionCategoriaCliente;
+            categoryFromDatabase.Activo = model.Activo;
+            _context.CategoriaCliente.Update(categoryFromDatabase);
+            
             try
             {
                 await _context.SaveChangesAsync();
@@ -84,9 +88,15 @@ namespace Demo_DataAnnotations.Controllers
 
         // POST: api/ClientCategories
         [HttpPost]
-        public async Task<IActionResult> PostCategory(CategoriaCliente model)
+        public async Task<IActionResult> PostCategory(CategoryDTO model)
         {
-            _context.CategoriaCliente.Add(model);
+            CategoriaCliente newCategory = new CategoriaCliente()
+            {
+                NombreCategoriaCliente = model.NombreCategoriaCliente,
+                DescripcionCategoriaCliente = model.DescripcionCategoriaCliente,
+                Activo = model.Activo
+            };
+            _context.CategoriaCliente.Add(newCategory);
 
             try
             {
