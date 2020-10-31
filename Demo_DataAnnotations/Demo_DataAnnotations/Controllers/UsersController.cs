@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Demo_DataAnnotations.Context;
 using Demo_DataAnnotations.Models.DBModels;
+using Demo_DataAnnotations.DTOs;
 
 namespace Demo_DataAnnotations.Controllers
 {
@@ -41,7 +42,7 @@ namespace Demo_DataAnnotations.Controllers
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, Usuarios model)
+        public async Task<IActionResult> PutUser(int id, UserDTO model)
         {
             bool compareId = id != model.Id;
             if (compareId)
@@ -56,8 +57,11 @@ namespace Demo_DataAnnotations.Controllers
                 return NotFound();
             }
 
-            _context.Entry(model).State = EntityState.Modified;
+            userFromDatabase.Nombres = model.Nombres;
+            userFromDatabase.NumeroCelular = model.NumeroCelular;
+            userFromDatabase.CorreoElectronico = model.CorreoElectronico;
 
+            _context.Usuarios.Update(userFromDatabase);
             try
             {
                 await _context.SaveChangesAsync();
@@ -71,9 +75,17 @@ namespace Demo_DataAnnotations.Controllers
 
         // POST: api/Users
         [HttpPost]
-        public async Task<IActionResult> PostUser(Usuarios model)
+        public async Task<IActionResult> PostUser(RegisterDTO model)
         {
-            _context.Usuarios.Add(model);
+            Usuarios newUser = new Usuarios()
+            {
+                Nombres = model.Nombres,
+                NumeroCelular = model.NumeroCelular,
+                CorreoElectronico = model.CorreoElectronico,
+                Password = model.Password,
+            };
+            _context.Usuarios.Add(newUser);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -82,7 +94,6 @@ namespace Demo_DataAnnotations.Controllers
             {
                 return BadRequest();
             }
-
             return Ok();
         }
 
