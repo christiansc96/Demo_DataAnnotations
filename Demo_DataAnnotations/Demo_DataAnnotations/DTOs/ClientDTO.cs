@@ -38,7 +38,8 @@ namespace Demo_DataAnnotations.DTOs
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (this.NombreNegocio == "" && this.RTN != "")
+            bool validateIfBussinesName = String.IsNullOrEmpty(this.NombreNegocio) && (!String.IsNullOrEmpty(this.RTN));
+            if (validateIfBussinesName)
             {
                 yield return new
                     ValidationResult(
@@ -49,7 +50,8 @@ namespace Demo_DataAnnotations.DTOs
                     });
             }
 
-            if (this.NombreNegocio != "" && this.RTN == "")
+            bool validateIfRTN = String.IsNullOrEmpty(this.RTN) && (!String.IsNullOrEmpty(this.NombreNegocio));
+            if (validateIfRTN)
             {
                 yield return new
                     ValidationResult(
